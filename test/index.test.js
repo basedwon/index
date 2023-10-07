@@ -7,12 +7,16 @@ const IndexField = require('../lib/index-field')
 const Storage = require('@plaindb/storage/mock')
 
 describe('Index', () => {
-  const storage = new Storage()
-  const index = new Index(storage, ['field1', 'field2|multi', 'field3 text'])
+  const entity = { id: 1, name: 'Alice', age: 33, bio: 'Software Developer', gender: 'F', height: `5'4"` }
+  const charlie = { id: 2, name: 'Charlie', age: 42, bio: 'Business Developer', gender: 'M', height: `6'4"` }
+  const newEntity = { ...entity, name: 'Bob' }
+
+  let storage = new Storage()
+  let index = new Index(storage, ['name', 'name|age', 'bio text'])
 
   describe('constructor', () => {
     it('should set default fields', () => {
-      expect(index.fields).to.have.keys(['field1', 'field2Multi', 'field3Text'])
+      expect(index.fields).to.have.keys(['name', 'nameAge', 'bioText'])
     })
     
     it('should initialize keys set', () => {
@@ -31,51 +35,150 @@ describe('Index', () => {
 
   describe('by', () => {
     it('should add a new field', () => {
-      index.by('newField')
-      expect(index.fields).to.have.keys(['field1', 'field2Multi', 'field3Text', 'newField'])
+      index.by('gender')
+      expect(index.fields).to.have.keys(['name', 'nameAge', 'bioText', 'gender'])
     })
   })
 
-  describe('@todo - dispatch', () => {
+  describe('dispatch', () => {
     it('should call storage.root.batch with ops', async () => {
-      // const ops = [{}, {}, {}]
-      // index.buildAdd = sinon.stub().returns(ops)
-
-      // await index.dispatch('add', {})
-
-      // expect(storage.root.batch.calledWith(ops)).to.be.true
+      await index.dispatch('add', entity)
+      const db = storage.sub(['name', 'alice'])
+      for await (const [id, value] of db.iterator()) {
+        expect(value).to.be.true
+        expect(id).to.equal('1')
+      }
     })
   })
-
-
-
 
   describe('buildAdd', () => {
     it('should build operations for adding entity', () => {
-      // const entity = { id: 1, field1: 'test1' }
-      // const ops = []
-      
-      // index.fields.field1 = { add: sinon.stub().returns(ops) }
-      
-      // const result = index.buildAdd(entity)
-
-      // expect(index.fields.field1.add.calledWith(entity, ops)).to.be.true
-      // expect(result).to.equal(ops)
+      const expectedOps = [
+        { path: [ 'name', 'alice' ], type: 'put', key: 1, value: true },
+        { path: [ 'nameAge', 'alice|33' ], type: 'put', key: 1, value: true },
+        { path: [ 'bioText', 'software' ], type: 'put', key: 1, value: true },
+        { path: [ 'bioText', 'developer' ], type: 'put', key: 1, value: true },
+        { path: [ 'gender', 'f' ], type: 'put', key: 1, value: true }
+      ]
+      const ops = index.buildAdd(entity)
+      expect(ops).to.have.lengthOf(5)
+      expect(ops).to.eql(expectedOps)
     })
   })
 
   describe('add', () => {
     it('should dispatch add operation', async () => {
-      // index.dispatch = sinon.stub().resolves()
-
-      // await index.add({})
-
-      // expect(index.dispatch.calledWith('add')).to.be.true
+      await index.add(entity)
+      const db = storage.sub(['name', 'alice'])
+      const results = []
+      for await (const [id, value] of db.iterator()) {
+        results.push({ id, value })
+      }
+      expect(results).to.have.lengthOf(1)
+      expect(results[0].value).to.be.true
+      expect(results[0].id).to.equal('1')
     })
   })
 
+  describe('buildUpdate', () => {
+    it('should build operations for updating entity', () => {
+      const ops = index.buildUpdate(entity, newEntity)
+      const expectedOps = [
+        { path: [ 'name', 'alice' ], type: 'del', key: 1 },
+        { path: [ 'name', 'bob' ], type: 'put', key: 1, value: true },
+        { path: [ 'nameAge', 'alice|33' ], type: 'del', key: 1 },
+        { path: [ 'nameAge', 'bob|33' ], type: 'put', key: 1, value: true }
+      ]
+      expect(ops).to.have.lengthOf(4)
+      expect(ops).to.eql(expectedOps)
+    })
+  })
 
+  describe('update', () => {
+    it('should dispatch update operation', async () => {
+      await index.update(entity, newEntity)
+      const db = storage.sub(['name', 'bob'])
+      const results = []
+      for await (const [id, value] of db.iterator()) {
+        results.push({ id, value })
+        expect(value).to.be.true
+        expect(id).to.equal('1')
+      }
+      expect(results).to.have.lengthOf(1)
+      expect(results[0].value).to.be.true
+      expect(results[0].id).to.equal('1')
+    })
+  })
 
+  describe('buildRemove', () => {
+    it('should build operations for removing entity', () => {
+      const expectedOps = [
+        { path: [ 'name', 'alice' ], type: 'del', key: 1 },
+        { path: [ 'nameAge', 'alice|33' ], type: 'del', key: 1 },
+        { path: [ 'bioText', 'software' ], type: 'del', key: 1 },
+        { path: [ 'bioText', 'developer' ], type: 'del', key: 1 },
+        { path: [ 'gender', 'f' ], type: 'del', key: 1 }
+      ]
+      const ops = index.buildRemove(entity)
+      expect(ops).to.have.lengthOf(5)
+      expect(ops).to.eql(expectedOps)
+    })
+  })
+
+  describe('remove', () => {
+    it('should dispatch remove operation', async () => {
+      await index.remove(newEntity)
+      const results = []
+      for await (const [id, value] of storage.sub(['name', 'bob']).iterator()) {
+        results.push(id)
+      }
+      expect(results).to.have.lengthOf(0)
+    })
+  })
+
+  describe('find', async () => {
+    beforeEach(async () => {
+      storage = new Storage()
+      index = new Index(storage, ['name', 'name|age', 'bio text'])
+      await index.add(entity)
+      await index.add(charlie)
+
+      // // Set up some mock data and methods
+      // index.keys = new Set([1, 2, 3])
+      // index.fields.field1 = { find: sinon.stub() }
+      // index.fields.field2 = { find: sinon.stub() }
+    })
+
+    it('should return empty array if no key matches', async () => {
+      const results = await index.find('name', 'Bob')
+      expect(results).to.be.empty
+    })
+
+    it('should return matched keys', async () => {
+      const results = await index.find('name', 'Alice')
+      expect(results).to.deep.equal(['1'])
+    })
+
+    it('should work with a single field', async () => {
+      const results = await index.find({ name: 'Alice' })
+      expect(results).to.deep.equal(['1'])
+    })
+
+    it('should work with multiple fields', async () => {
+      const results = await index.find({ name: 'Alice', age: 33 })
+      expect(results).to.deep.equal(['1'])
+    })
+
+    it('should work with text fields', async () => {
+      const results = await index.find('bioText', 'developer')
+      expect(results).to.deep.equal(['1', '2'])
+    })
+
+    it('should handle non-existent fields gracefully', async () => {
+      const results = await index.find({ nonexistentField: 'value' })
+      expect(results).to.be.empty
+    })
+  })
 })
 
 describe('IndexFactory', () => {
@@ -123,7 +226,6 @@ describe('IndexField', () => {
   })
 })
 
-/*
 describe('SingleIndexField', () => {
 })
 
@@ -131,126 +233,4 @@ describe('MultiIndexField', () => {
 })
 
 describe('TextIndexField', () => {
-})
-*/
-
-describe.omit('Index', () => {
-  let storage
-  let index
-
-  beforeEach(() => {
-    storage = {
-      root: {
-        batch: sinon.stub().resolves()
-      }
-    }
-    index = new Index(storage, ['field1', 'field2|multi', 'field3 text'])
-  })
-
-
-  describe('buildRemove', () => {
-    it('should build operations for removing entity', () => {
-      const entity = { id: 1, field1: 'test1' }
-      const ops = []
-      
-      index.fields.field1 = { remove: sinon.stub().returns(ops) }
-
-      const result = index.buildRemove(entity)
-
-      expect(index.fields.field1.remove.calledWith(entity, ops)).to.be.true
-      expect(result).to.equal(ops)
-    })
-  })
-
-  describe('remove', () => {
-    it('should dispatch remove operation', async () => {
-      index.dispatch = sinon.stub().resolves()
-
-      await index.remove({})
-
-      expect(index.dispatch.calledWith('remove')).to.be.true
-    })
-  })
-
-  describe('buildUpdate', () => {
-    it('should build operations for updating entity', () => {
-      const oldEntity = { id: 1, field1: 'test1' }
-      const newEntity = { id: 1, field1: 'test2' }
-      const ops = []
-      
-      index.fields.field1 = { update: sinon.stub().returns(ops) }
-
-      const result = index.buildUpdate(oldEntity, newEntity)
-
-      expect(index.fields.field1.update.calledWith(oldEntity, newEntity, ops)).to.be.true
-      expect(result).to.equal(ops)
-    })
-  })
-
-  describe('update', () => {
-    it('should dispatch update operation', async () => {
-      index.dispatch = sinon.stub().resolves()
-
-      await index.update({}, {})
-
-      expect(index.dispatch.calledWith('update')).to.be.true
-    })
-  })
-
-  // You could add more tests for 'find' method depending on your needs
-})
-
-describe.omit('Index', () => {
-  // ... (Previous set-up code and other tests)
-
-  describe('find', () => {
-    beforeEach(() => {
-      // Set up some mock data and methods
-      index.keys = new Set([1, 2, 3])
-      index.fields.field1 = { find: sinon.stub() }
-      index.fields.field2 = { find: sinon.stub() }
-    })
-
-    it('should return empty array if no key matches', async () => {
-      index.fields.field1.find.returns(new Set([]))
-      index.fields.field2.find.returns(new Set([]))
-
-      const result = await index.find({ field1: 'value1', field2: 'value2' })
-      
-      expect(result).to.be.empty
-    })
-
-    it('should return matched keys', async () => {
-      index.fields.field1.find.returns(new Set([1, 2]))
-      index.fields.field2.find.returns(new Set([2, 3]))
-
-      const result = await index.find({ field1: 'value1', field2: 'value2' })
-      
-      expect(result).to.deep.equal([2])
-    })
-
-    it('should work with a single field', async () => {
-      index.fields.field1.find.returns(new Set([1, 2]))
-
-      const result = await index.find({ field1: 'value1' })
-      
-      expect(result).to.deep.equal([1, 2])
-    })
-
-    it('should work with multiple fields', async () => {
-      index.fields.field1.find.returns(new Set([1, 2]))
-      index.fields.field2.find.returns(new Set([2, 3]))
-      index.fields.field3.find.returns(new Set([2, 4]))
-
-      const result = await index.find({ field1: 'value1', field2: 'value2', field3: 'value3' })
-      
-      expect(result).to.deep.equal([2])
-    })
-
-    it('should handle non-existent fields gracefully', async () => {
-      const result = await index.find({ nonexistentField: 'value' })
-      
-      expect(result).to.be.empty
-    })
-  })
 })
