@@ -1,13 +1,13 @@
 ## Classes
 
 <dl>
-<dt><a href="#MultiIndexField">MultiIndexField</a></dt>
+<dt><a href="#MultiIndexField">MultiIndexField</a> ⇐ <code><a href="#IndexField">IndexField</a></code></dt>
 <dd><p>Multi index field class.</p>
 </dd>
 <dt><a href="#SingleIndexField">SingleIndexField</a> ⇐ <code><a href="#IndexField">IndexField</a></code></dt>
 <dd><p>Single index field class.</p>
 </dd>
-<dt><a href="#TextIndexField">TextIndexField</a></dt>
+<dt><a href="#TextIndexField">TextIndexField</a> ⇐ <code><a href="#IndexField">IndexField</a></code></dt>
 <dd><p>Text index field class.</p>
 </dd>
 <dt><a href="#IndexFactory">IndexFactory</a></dt>
@@ -23,22 +23,38 @@
 
 <a name="MultiIndexField"></a>
 
-## MultiIndexField
+## MultiIndexField ⇐ [<code>IndexField</code>](#IndexField)
 Multi index field class.
 
 **Kind**: global class  
+**Extends**: [<code>IndexField</code>](#IndexField)  
 
-* [MultiIndexField](#MultiIndexField)
+* [MultiIndexField](#MultiIndexField) ⇐ [<code>IndexField</code>](#IndexField)
+    * [.path](#IndexField+path) ⇒ <code>Array.&lt;string&gt;</code>
     * [.getKeys(field)](#MultiIndexField+getKeys) ⇒ <code>Array</code>
     * [.getPath(entity)](#MultiIndexField+getPath) ⇒ <code>Array</code>
     * [.find(...query)](#MultiIndexField+find) ⇒ <code>Promise.&lt;Array.&lt;any&gt;&gt;</code>
+    * [.normalize(value)](#IndexField+normalize) ⇒ <code>any</code>
+    * [.buildOps(type, entity, ops)](#IndexField+buildOps) ⇒ <code>Array</code>
+    * [.add(entity, [ops])](#IndexField+add) ⇒ <code>Array</code>
+    * [.update(oldEntity, newEntity, [ops])](#IndexField+update) ⇒ <code>Array</code>
+    * [.remove(entity, [ops])](#IndexField+remove) ⇒ <code>Array</code>
+    * [.isMatch(oldEntity, newEntity)](#IndexField+isMatch) ⇒ <code>boolean</code>
 
+<a name="IndexField+path"></a>
+
+### multiIndexField.path ⇒ <code>Array.&lt;string&gt;</code>
+Gets the path of the field.
+
+**Kind**: instance property of [<code>MultiIndexField</code>](#MultiIndexField)  
+**Returns**: <code>Array.&lt;string&gt;</code> - - The path.  
 <a name="MultiIndexField+getKeys"></a>
 
 ### multiIndexField.getKeys(field) ⇒ <code>Array</code>
 Retrieves keys for the index field.
 
 **Kind**: instance method of [<code>MultiIndexField</code>](#MultiIndexField)  
+**Overrides**: [<code>getKeys</code>](#IndexField+getKeys)  
 **Returns**: <code>Array</code> - - Returns the key array.  
 
 | Param | Type | Description |
@@ -51,6 +67,7 @@ Retrieves keys for the index field.
 Retrieves path based on the entity.
 
 **Kind**: instance method of [<code>MultiIndexField</code>](#MultiIndexField)  
+**Overrides**: [<code>getPath</code>](#IndexField+getPath)  
 **Returns**: <code>Array</code> - - Returns the path array.  
 
 | Param | Type | Description |
@@ -63,11 +80,91 @@ Retrieves path based on the entity.
 Finds an entry in the index.
 
 **Kind**: instance method of [<code>MultiIndexField</code>](#MultiIndexField)  
+**Overrides**: [<code>find</code>](#IndexField+find)  
 **Returns**: <code>Promise.&lt;Array.&lt;any&gt;&gt;</code> - - The search results.  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | ...query | <code>any</code> | Query to search for. |
+
+<a name="IndexField+normalize"></a>
+
+### multiIndexField.normalize(value) ⇒ <code>any</code>
+Normalizes a value for indexing.
+
+**Kind**: instance method of [<code>MultiIndexField</code>](#MultiIndexField)  
+**Returns**: <code>any</code> - - The normalized value.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| value | <code>any</code> | The value to normalize. |
+
+<a name="IndexField+buildOps"></a>
+
+### multiIndexField.buildOps(type, entity, ops) ⇒ <code>Array</code>
+Builds operations for a specific type.
+
+**Kind**: instance method of [<code>MultiIndexField</code>](#MultiIndexField)  
+**Returns**: <code>Array</code> - - The updated operations array.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| type | <code>string</code> | The type of operation. |
+| entity | <code>Object</code> | The entity to operate on. |
+| ops | <code>Array</code> | The operations array. |
+
+<a name="IndexField+add"></a>
+
+### multiIndexField.add(entity, [ops]) ⇒ <code>Array</code>
+Adds an entity to the index field.
+
+**Kind**: instance method of [<code>MultiIndexField</code>](#MultiIndexField)  
+**Returns**: <code>Array</code> - - The updated operations array.  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| entity | <code>Object</code> |  | The entity to add. |
+| [ops] | <code>Array</code> | <code>[]</code> | Optional operations array to append to. |
+
+<a name="IndexField+update"></a>
+
+### multiIndexField.update(oldEntity, newEntity, [ops]) ⇒ <code>Array</code>
+Updates an existing entity in the index field.
+
+**Kind**: instance method of [<code>MultiIndexField</code>](#MultiIndexField)  
+**Returns**: <code>Array</code> - - The updated operations array.  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| oldEntity | <code>Object</code> |  | The existing entity to update. |
+| newEntity | <code>Object</code> |  | The new entity data. |
+| [ops] | <code>Array</code> | <code>[]</code> | Optional operations array to append to. |
+
+<a name="IndexField+remove"></a>
+
+### multiIndexField.remove(entity, [ops]) ⇒ <code>Array</code>
+Removes an entity from the index field.
+
+**Kind**: instance method of [<code>MultiIndexField</code>](#MultiIndexField)  
+**Returns**: <code>Array</code> - - The updated operations array.  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| entity | <code>Object</code> |  | The entity to remove. |
+| [ops] | <code>Array</code> | <code>[]</code> | Optional operations array to append to. |
+
+<a name="IndexField+isMatch"></a>
+
+### multiIndexField.isMatch(oldEntity, newEntity) ⇒ <code>boolean</code>
+Checks if old and new entities match.
+
+**Kind**: instance method of [<code>MultiIndexField</code>](#MultiIndexField)  
+**Returns**: <code>boolean</code> - - Whether the old and new entities match.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| oldEntity | <code>Object</code> | The old entity. |
+| newEntity | <code>Object</code> | The new entity. |
 
 <a name="SingleIndexField"></a>
 
@@ -214,23 +311,38 @@ Checks if old and new entities match.
 
 <a name="TextIndexField"></a>
 
-## TextIndexField
+## TextIndexField ⇐ [<code>IndexField</code>](#IndexField)
 Text index field class.
 
 **Kind**: global class  
+**Extends**: [<code>IndexField</code>](#IndexField)  
 
-* [TextIndexField](#TextIndexField)
+* [TextIndexField](#TextIndexField) ⇐ [<code>IndexField</code>](#IndexField)
+    * [.path](#IndexField+path) ⇒ <code>Array.&lt;string&gt;</code>
     * [.getKeys(field)](#TextIndexField+getKeys) ⇒ <code>Array</code>
     * [.isMatch(oldEntity, newEntity)](#TextIndexField+isMatch) ⇒ <code>boolean</code>
     * [.buildOps(type, entity, ops)](#TextIndexField+buildOps) ⇒ <code>Array</code>
     * [.find(...query)](#TextIndexField+find) ⇒ <code>Promise.&lt;Array.&lt;any&gt;&gt;</code>
+    * [.normalize(value)](#IndexField+normalize) ⇒ <code>any</code>
+    * [.add(entity, [ops])](#IndexField+add) ⇒ <code>Array</code>
+    * [.update(oldEntity, newEntity, [ops])](#IndexField+update) ⇒ <code>Array</code>
+    * [.remove(entity, [ops])](#IndexField+remove) ⇒ <code>Array</code>
+    * [.getPath(entity)](#IndexField+getPath) ⇒ <code>Array</code>
 
+<a name="IndexField+path"></a>
+
+### textIndexField.path ⇒ <code>Array.&lt;string&gt;</code>
+Gets the path of the field.
+
+**Kind**: instance property of [<code>TextIndexField</code>](#TextIndexField)  
+**Returns**: <code>Array.&lt;string&gt;</code> - - The path.  
 <a name="TextIndexField+getKeys"></a>
 
 ### textIndexField.getKeys(field) ⇒ <code>Array</code>
 Retrieves keys for the index field.
 
 **Kind**: instance method of [<code>TextIndexField</code>](#TextIndexField)  
+**Overrides**: [<code>getKeys</code>](#IndexField+getKeys)  
 **Returns**: <code>Array</code> - - Returns the key array.  
 
 | Param | Type | Description |
@@ -243,6 +355,7 @@ Retrieves keys for the index field.
 Checks if old and new entities match.
 
 **Kind**: instance method of [<code>TextIndexField</code>](#TextIndexField)  
+**Overrides**: [<code>isMatch</code>](#IndexField+isMatch)  
 **Returns**: <code>boolean</code> - - Whether the old and new entities match.  
 
 | Param | Type | Description |
@@ -256,6 +369,7 @@ Checks if old and new entities match.
 Builds operations for text-based fields.
 
 **Kind**: instance method of [<code>TextIndexField</code>](#TextIndexField)  
+**Overrides**: [<code>buildOps</code>](#IndexField+buildOps)  
 **Returns**: <code>Array</code> - - The updated operations array.  
 
 | Param | Type | Description |
@@ -270,11 +384,76 @@ Builds operations for text-based fields.
 Finds an entry in the index.
 
 **Kind**: instance method of [<code>TextIndexField</code>](#TextIndexField)  
+**Overrides**: [<code>find</code>](#IndexField+find)  
 **Returns**: <code>Promise.&lt;Array.&lt;any&gt;&gt;</code> - - The search results.  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | ...query | <code>any</code> | Query to search for. |
+
+<a name="IndexField+normalize"></a>
+
+### textIndexField.normalize(value) ⇒ <code>any</code>
+Normalizes a value for indexing.
+
+**Kind**: instance method of [<code>TextIndexField</code>](#TextIndexField)  
+**Returns**: <code>any</code> - - The normalized value.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| value | <code>any</code> | The value to normalize. |
+
+<a name="IndexField+add"></a>
+
+### textIndexField.add(entity, [ops]) ⇒ <code>Array</code>
+Adds an entity to the index field.
+
+**Kind**: instance method of [<code>TextIndexField</code>](#TextIndexField)  
+**Returns**: <code>Array</code> - - The updated operations array.  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| entity | <code>Object</code> |  | The entity to add. |
+| [ops] | <code>Array</code> | <code>[]</code> | Optional operations array to append to. |
+
+<a name="IndexField+update"></a>
+
+### textIndexField.update(oldEntity, newEntity, [ops]) ⇒ <code>Array</code>
+Updates an existing entity in the index field.
+
+**Kind**: instance method of [<code>TextIndexField</code>](#TextIndexField)  
+**Returns**: <code>Array</code> - - The updated operations array.  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| oldEntity | <code>Object</code> |  | The existing entity to update. |
+| newEntity | <code>Object</code> |  | The new entity data. |
+| [ops] | <code>Array</code> | <code>[]</code> | Optional operations array to append to. |
+
+<a name="IndexField+remove"></a>
+
+### textIndexField.remove(entity, [ops]) ⇒ <code>Array</code>
+Removes an entity from the index field.
+
+**Kind**: instance method of [<code>TextIndexField</code>](#TextIndexField)  
+**Returns**: <code>Array</code> - - The updated operations array.  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| entity | <code>Object</code> |  | The entity to remove. |
+| [ops] | <code>Array</code> | <code>[]</code> | Optional operations array to append to. |
+
+<a name="IndexField+getPath"></a>
+
+### textIndexField.getPath(entity) ⇒ <code>Array</code>
+Retrieves path based on the entity.
+
+**Kind**: instance method of [<code>TextIndexField</code>](#TextIndexField)  
+**Returns**: <code>Array</code> - - Returns the path array.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| entity | <code>Object</code> | The entity to consider. |
 
 <a name="IndexFactory"></a>
 

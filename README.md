@@ -97,12 +97,6 @@ const index = new Index(storage, ['name'], {
 
 - [API Reference](/docs/api.md)
 
-
-
-
-
-## API
-
 ### Classes
 
 - `Index`: Manages multiple index fields and dispatches operations.
@@ -123,52 +117,6 @@ const index = new Index(storage, ['name'], {
 ## Extending
 
 To extend the library with a custom index field, create a class extending `IndexField` and register it via `Registry`.
-
-
-
-
-
-## API
-
-- `Index`
-  - `constructor(storage, fields[], opts)`
-  - `by(slug: string): Index`
-  - `add(entity: object): Promise`
-  - `remove(entity: object): Promise`
-  - `update(oldEntity: object, newEntity: object): Promise`
-  - `find(query: string|object, ...values): Promise`
-- `IndexField`
-  - `constructor(index, options)`
-  - `normalize(value): any`
-  - `buildOps(type: string, entity: object, ops: array): array`
-  - `add(entity: object, ops: array): array`
-  - `update(oldEntity: object, newEntity: object, ops: array): array`
-  - `remove(entity: object, ops: array): array`
-  - `find(...query): Promise`
-- `SingleIndexField`
-  - `find(query: any): Promise`
-- `MultiIndexField`
-  - `getKeys(field: string): array`
-  - `getPath(entity: object): string`
-  - `find(...query): Promise`
-- `TextIndexField`
-  - `getKeys(field: string): array`
-  - `isMatch(oldEntity: object, newEntity: object): boolean`
-  - `buildOps(type: string, entity: object, ops: array): array`
-  - `find(...query): Promise`
-- `IndexFactory`
-  - `constructor(index)`
-  - `getFieldKey(slug: string): string`
-  - `getFieldType(slug: string): object`
-  - `createField(definition: string): IndexField`
-
-
-
-
-
-
-
-
 
 ## Tests
 
