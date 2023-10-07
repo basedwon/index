@@ -1,0 +1,74 @@
+{
+  "name": "@plaindb/index",
+  "version": "0.0.0",
+  "description": "A comprehensive indexing solution built to cater to a wide variety of indexing requirements.",
+  "author": "Basedwon <basedwon@protonmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/basedwon/index.git"
+  },
+  "bugs": {
+    "url": "https://github.com/basedwon/index/issues"
+  },
+  "homepage": "https://github.com/basedwon/index#readme",
+  "main": "lib/index.js",
+  "browser": {
+    ".": "./lib/index.js"
+  },
+  "scripts": {
+    "dev:test": "nodemon -w ../.. -x npm test",
+    "dev": "nodemon -w ../.. test/index.test.js",
+    "docs": "jsdoc2md \"lib/**/*.js\" > docs/api.md",
+    "update": "npm run update:prod && npm run update:dev",
+    "update:prod": "npm i -S basd@latest @basd/formatter@latest @basd/registry@latest",
+    "update:dev": "npm i -D @basd/testr@latest @plaindb/storage@latest",
+    "test": "testr test"
+  },
+  "dependencies": {
+    "@basd/formatter": "^0.0.0",
+    "@basd/registry": "^0.0.0",
+    "basd": "^1.0.13"
+  },
+  "devDependencies": {
+    "@basd/testr": "^0.1.2",
+    "@plaindb/storage": "^0.0.6",
+    "jsdoc": "^4.0.2",
+    "jsdoc-to-markdown": "^8.0.0"
+  },
+  "keywords": [
+    "database",
+    "indexing",
+    "search",
+    "query",
+    "key-value",
+    "NoSQL",
+    "storage",
+    "OOP",
+    "design patterns",
+    "SOLID",
+    "asynchronous",
+    "fast-lookup",
+    "big-data",
+    "data-structure",
+    "persistent",
+    "low-latency",
+    "high-throughput",
+    "scalable",
+    "real-time",
+    "distributed-system",
+    "performance",
+    "optimization",
+    "cloud-database",
+    "open-source",
+    "batch operations",
+    "formatter",
+    "reducer",
+    "single field",
+    "multi field",
+    "text field",
+    "dynamic indexing",
+    "entity management",
+    "key-value store"
+  ]
+}
