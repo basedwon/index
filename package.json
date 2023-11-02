@@ -26,9 +26,9 @@
     "test": "testr test"
   },
   "dependencies": {
-    "@basd/formatter": "^0.0.1",
-    "@basd/registry": "^0.0.1",
-    "basd": "^1.0.13"
+    "@basd/formatter": "^0.0.2",
+    "@basd/registry": "^0.0.3",
+    "basd": "^1.0.16"
   },
   "devDependencies": {
     "@basd/testr": "^0.1.2",
